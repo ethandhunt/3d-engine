@@ -7,6 +7,8 @@ pygame.init()
 WIDTH = 500
 HEIGHT = 500
 window = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.mouse.set_visible(False)
+pygame.event.set_grab(True)
 
 BLACK = (0, 0, 0)
 
@@ -66,28 +68,38 @@ outTermMap()
 
 dir = 0
 walkSpeed = 0.1
-
 startTime = time.time()
+print('Press esc to exit')
 while True:
     pygame.draw.rect(window, BLACK, ((0, 0), (WIDTH, HEIGHT)))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
     render()
+    dir += math.radians(pygame.mouse.get_rel()[0])
+
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        dir -= math.radians(10)
-    if keys[pygame.K_RIGHT]:
-        dir += math.radians(10)
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_a]:
+        if not getMap(x + math.sin(dir - math.radians(90)) * walkSpeed, y - math.cos(dir + math.radians(90)) * walkSpeed):
+            x -= math.sin(dir + math.radians(90)) * walkSpeed
+            y -= math.cos(dir + math.radians(90)) * walkSpeed
+    if keys[pygame.K_d]:
+        if not getMap(x + math.sin(dir + math.radians(90)) * walkSpeed, y + math.cos(dir + math.radians(90)) * walkSpeed):
+            x += math.sin(dir + math.radians(90)) * walkSpeed
+            y += math.cos(dir + math.radians(90)) * walkSpeed
+    if keys[pygame.K_w]:
         if not getMap(x + math.sin(dir) * walkSpeed, y + math.cos(dir) * walkSpeed):
             x += math.sin(dir) * walkSpeed
             y += math.cos(dir) * walkSpeed
-    if keys[pygame.K_DOWN]:
+    if keys[pygame.K_s]:
         if not getMap(x - math.sin(dir) * walkSpeed, y - math.cos(dir) * walkSpeed):
             x -= math.sin(dir) * walkSpeed
             y -= math.cos(dir) * walkSpeed
-    drawText(f'FPS: {int(1/(time.time() - startTime))}', 12, (255, 255, 0), (0, 0))
+    drawText(f'FPS: {int(1/(time.time() - startTime))}', 12, (255, 255, 255), (0, 0))
     startTime = time.time()
     pygame.display.update()
