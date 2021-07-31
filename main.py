@@ -1,4 +1,3 @@
-from typing import cast
 import pygame
 import math
 import sys
