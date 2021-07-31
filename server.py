@@ -1,7 +1,5 @@
 import socket
 import threading
-import pygame
-import sys
 
 def rcv(conn):
     while True:
@@ -67,11 +65,15 @@ def handleClient(conn, addr):
                         array += [str(player.pos[0]) + ':' + str(player.pos[1])]
                 print(','.join(array))
                 thisClient.send(','.join(array))
+            elif msg == 'QUIT':
+                raise Exception
             else:
                 thisClient.updatePos(msg.split(':'))
     except:
-        CLIENTS.remove(thisClient)
-        print(f'{addr} Disconnected')
+        try:
+            CLIENTS.remove(thisClient)
+            print(f'{addr} Disconnected')
+        except: pass
 
 with open('map.txt') as f:
     MAP = f.read()

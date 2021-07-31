@@ -5,13 +5,6 @@ import time
 import socket
 import threading
 
-def rcv(conn):
-    while True:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
-        if msg_length:
-            msg_length = int(msg_length)
-            return conn.recv(msg_length).decode(FORMAT)
-
 def send(conn, msg):
     message = msg.encode(FORMAT)
     msg_length = len(message)
@@ -19,6 +12,13 @@ def send(conn, msg):
     send_length += b' ' * (HEADER - len(send_length))
     conn.send(send_length)
     conn.send(message)
+
+def rcv(conn):
+    while True:
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+        if msg_length:
+            msg_length = int(msg_length)
+            return conn.recv(msg_length).decode(FORMAT)
 
 class connection:
     def __init__(self, conn):
@@ -44,6 +44,7 @@ playerPositions = []
 
 def playerPos():
     global playerPositions
+    global exit
     while True:
         SERVER.send('GETPLAYERS')
         unparsedString = SERVER.rcv()
@@ -53,6 +54,7 @@ def playerPos():
         playerPositions = [[float(b) for b in a.split(':')] for a in unparsedString.split(',')]
         SERVER.send(f'{x}:{y}')
         if exit:
+            SERVER.send("QUIT")
             sys.exit()
 
 pygame.init()
@@ -136,10 +138,9 @@ def render():
         pygame.draw.line(window, (min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255), (i, (HEIGHT - lineHeight)/2), (i, HEIGHT + (lineHeight - HEIGHT)/2))
     if playerPositions == []: return
     for player in playerPositions:
-        if abs(getAngle((x, y), player) + dir) < FOV:
-            screenX = round(((getAngle((x, y), player) + dir)/FOV)*WIDTH)
-            if array[screenX] > rayDist(player[0], player[1]):
-                pygame.draw.circle(window, (255, 0, 0), (screenX, HEIGHT//2), 1/max(rayDist(player[0], player[1]), 1) * HEIGHT)
+        screenX = ((getAngle((x, y), player) - dir)/FOV)*WIDTH
+        print(screenX)
+        pygame.draw.circle(window, (255, 0, 0), (screenX, HEIGHT//2), max(rayDist(player[0], player[1]), 1) * HEIGHT)
 
 outTermMap()
 
@@ -149,7 +150,7 @@ thread.start()
 dir = 0
 walkSpeed = 0.1
 startTime = time.time()
-print('Press esc to exit')
+print('Press esc to exit window')
 while True:
     pygame.draw.rect(window, BLACK, ((0, 0), (WIDTH, HEIGHT)))
     for event in pygame.event.get():
@@ -164,6 +165,7 @@ while True:
                 sys.exit()
     render()
     dir += math.radians(pygame.mouse.get_rel()[0])
+    dir = dir % math.radians(360)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a]:
