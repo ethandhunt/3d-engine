@@ -2,6 +2,7 @@ import pygame
 import math
 import sys
 import time
+<<<<<<< HEAD
 import socket
 import threading
 
@@ -56,6 +57,8 @@ def playerPos():
         if exit:
             SERVER.send("QUIT")
             sys.exit()
+=======
+>>>>>>> parent of 42cd706 (Added multiplayer, doesn't let you see people yet tho)
 
 pygame.init()
 WIDTH = 500
@@ -82,10 +85,8 @@ def drawText(text, size, colour, pos, font='courier', centered=False, updateScre
         pygame.display.update()
     return myfont.size(text)
 
-print('Requesting Map...')
-SERVER.send('MAPREQ')
-rawMap = SERVER.rcv()
-print('Got Map')
+with open('map.txt') as f:
+    rawMap = f.read()
 MAP=[]
 for mapX, line in enumerate(rawMap.split('\n')):
     MAP += [[]]
@@ -95,38 +96,27 @@ for mapX, line in enumerate(rawMap.split('\n')):
             x = mapX
             y = mapY
 
-if not pygame.mouse.get_focused():
-    print('Focus on the pygame window to continue')
-while not pygame.mouse.get_focused():
-    pass
-
 def rayDist(rayX, rayY):
     return math.dist((x, y), (rayX, rayY))
 
 def getMap(x, y):
     return MAP[max(min(round(x), len(MAP) - 1), 0)][max(min(round(y), len(MAP[0]) - 1), 0)]
 
-def rotate(point, angle):
-    return (round(point[0] * math.cos(angle) - point[1] * math.sin(angle), 10), round(point[0] * math.sin(angle) + point[1] * math.cos(angle), 10))
-
-def getAngle(start, end):
-    v1_theta = math.atan2(start[1], start[0])
-    v2_theta = math.atan2(end[1], end[0])
-    r = (v2_theta - v1_theta) * (180.0 / math.pi)
-    if r < 0:
-        r % 360
-    return math.radians(r)
-
 def render():
     FOV = math.radians(60)
     castResolution = 20
+<<<<<<< HEAD
     array = []
     rayWidth = 10
     for i in range(WIDTH//rayWidth):
         rayDir = FOV/WIDTH/rayWidth * (i - WIDTH/2/rayWidth) + dir
+=======
+    for i in range(WIDTH):
+        rayDir = FOV/WIDTH * (i - WIDTH/2) + dir
+>>>>>>> parent of 42cd706 (Added multiplayer, doesn't let you see people yet tho)
         rayX = x
         rayY = y
-        # Make dist not = 0. Ever
+        # make dist not = 0. Ever
         rayX += math.sin(rayDir) / castResolution
         rayY += math.cos(rayDir) / castResolution
         iteration = 0
@@ -134,19 +124,19 @@ def render():
             rayX += math.sin(rayDir) / castResolution * iteration/10
             rayY += math.cos(rayDir) / castResolution * iteration/10
             iteration += 1
-            array += [rayDist(rayX, rayY)]
+
         lineHeight = 1/max(rayDist(rayX, rayY), 1) * HEIGHT
         pygame.draw.line(window, (min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255), (i, (HEIGHT - lineHeight)/2), (i, HEIGHT + (lineHeight - HEIGHT)/2))
+<<<<<<< HEAD
     if playerPositions == []: return
     for player in playerPositions:
         screenX = ((getAngle((x, y), player) - dir)/FOV)*WIDTH
         print(screenX)
         pygame.draw.circle(window, (255, 0, 0), (screenX, HEIGHT//2), max(rayDist(player[0], player[1]), 1) * HEIGHT)
+=======
+>>>>>>> parent of 42cd706 (Added multiplayer, doesn't let you see people yet tho)
 
 outTermMap()
-
-thread = threading.Thread(target=playerPos)
-thread.start()
 
 dir = 0
 walkSpeed = 0.1
@@ -156,12 +146,10 @@ while True:
     pygame.draw.rect(window, BLACK, ((0, 0), (WIDTH, HEIGHT)))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            exit = True
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                exit = True
                 pygame.quit()
                 sys.exit()
     render()
