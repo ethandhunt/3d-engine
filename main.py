@@ -62,12 +62,13 @@ def render():
             rayX += math.sin(rayDir) / castResolution * iteration/5
             rayY += math.cos(rayDir) / castResolution * iteration/5
             iteration += 1
-        for _ in range(backTraceResolution):
-            rayX -= math.sin(rayDir) / backTraceResolution
-            rayY -= math.cos(rayDir) / backTraceResolution
-            if not getMap(rayX, rayY):
-                break
-        if rayDist(rayX, rayY) < HEIGHT:
+        if iteration < 1:
+            for _ in range(backTraceResolution):
+                rayX -= math.sin(rayDir) / backTraceResolution
+                rayY -= math.cos(rayDir) / backTraceResolution
+                if not getMap(rayX, rayY):
+                    break
+        elif rayDist(rayX, rayY) < HEIGHT:
             High = (rayX + math.sin(rayDir) / castResolution * iteration/5, rayY + math.cos(rayDir) / castResolution * iteration/5)
             Low = (rayX - math.sin(rayDir) / castResolution * iteration/5, rayY - math.cos(rayDir) / castResolution * iteration/5)
             for _ in range(backTraceDepth):
