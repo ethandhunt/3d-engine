@@ -48,7 +48,8 @@ def getMap(x, y):
 def render():
     FOV = math.radians(60)
     castResolution = 0.5
-    backTraceResolution = 10
+    backTraceDepth = 7
+    backTraceResolution = 20
     for i in range(WIDTH):
         rayDir = FOV/WIDTH * (i - WIDTH/2) + dir
         rayX = x
@@ -61,10 +62,23 @@ def render():
             rayX += math.sin(rayDir) / castResolution * iteration/5
             rayY += math.cos(rayDir) / castResolution * iteration/5
             iteration += 1
-        while getMap(rayX, rayY) and rayDist(rayX, rayY)>1:
+        for _ in range(backTraceResolution):
             rayX -= math.sin(rayDir) / backTraceResolution
             rayY -= math.cos(rayDir) / backTraceResolution
-            iteration += 1
+            if not getMap(rayX, rayY):
+                break
+        if rayDist(rayX, rayY) < HEIGHT:
+            High = (rayX + math.sin(rayDir) / castResolution * iteration/5, rayY + math.cos(rayDir) / castResolution * iteration/5)
+            Low = (rayX - math.sin(rayDir) / castResolution * iteration/5, rayY - math.cos(rayDir) / castResolution * iteration/5)
+            for _ in range(backTraceDepth):
+                MidX = sum([High[0], Low[0]])/2
+                MidY = sum([High[1], Low[1]])/2
+                if getMap(MidX, MidY):
+                    High = (MidX, MidY)
+                else:
+                    Low = (MidX, MidY)
+            rayX = MidX
+            rayY = MidY
         lineHeight = 1/max(rayDist(rayX, rayY), 1) * HEIGHT
         pygame.draw.line(window, (min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255), (i, (HEIGHT - lineHeight)/2), (i, HEIGHT + (lineHeight - HEIGHT)/2))
 
