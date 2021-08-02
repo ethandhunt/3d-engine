@@ -47,7 +47,7 @@ def getMap(x, y):
 
 def render():
     FOV = math.radians(60)
-    castResolution = 0.5
+    castResolution = 10
     backTraceDepth = 10
     for i in range(WIDTH):
         rayDir = FOV/WIDTH * (i - WIDTH/2) + dir
