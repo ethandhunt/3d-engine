@@ -47,7 +47,7 @@ def getMap(x, y):
 
 def render():
     FOV = math.radians(60)
-    castResolution = 20
+    castResolution = 2
     for i in range(WIDTH):
         rayDir = FOV/WIDTH * (i - WIDTH/2) + dir
         rayX = x
@@ -56,11 +56,14 @@ def render():
         rayX += math.sin(rayDir) / castResolution
         rayY += math.cos(rayDir) / castResolution
         iteration = 0
-        while iteration < 100 and not getMap(rayX, rayY):
+        while rayDist(rayX, rayY) < HEIGHT and not getMap(rayX, rayY):
             rayX += math.sin(rayDir) / castResolution * iteration/10
             rayY += math.cos(rayDir) / castResolution * iteration/10
             iteration += 1
-
+        while getMap(rayX, rayY) and rayDist(rayX, rayY)>1:
+            rayX -= math.sin(rayDir) / castResolution / 10
+            rayY -= math.cos(rayDir) / castResolution / 10
+            iteration += 1
         lineHeight = 1/max(rayDist(rayX, rayY), 1) * HEIGHT
         pygame.draw.line(window, (min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255), (i, (HEIGHT - lineHeight)/2), (i, HEIGHT + (lineHeight - HEIGHT)/2))
 
