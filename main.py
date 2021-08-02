@@ -51,19 +51,21 @@ def render():
     backTraceDepth = 10
     for i in range(WIDTH):
         rayDir = FOV/WIDTH * (i - WIDTH/2) + dir
+        sine = math.sin(rayDir) / castResolution
+        cosine = math.cos(rayDir) / castResolution
         rayX = x
         rayY = y
         # make dist not = 0. Ever
-        rayX += math.sin(rayDir) / castResolution
-        rayY += math.cos(rayDir) / castResolution
+        rayX += sine
+        rayY += cosine
         iteration = 0
         while rayDist(rayX, rayY) < HEIGHT and not getMap(rayX, rayY):
-            rayX += math.sin(rayDir) / castResolution * iteration
-            rayY += math.cos(rayDir) / castResolution * iteration
+            rayX += sine * iteration
+            rayY += cosine * iteration
             iteration += 0.5
         if rayDist(rayX, rayY) < HEIGHT:
-            High = (rayX + math.sin(rayDir) / castResolution * iteration, rayY + math.cos(rayDir) / castResolution * iteration)
-            Low = (rayX - math.sin(rayDir) / castResolution * iteration, rayY - math.cos(rayDir) / castResolution * iteration)
+            High = (rayX + sine * iteration, rayY + cosine * iteration)
+            Low = (rayX - sine * iteration, rayY - cosine * iteration)
             if iteration < 1:
                 Low = (x, y)
             for _ in range(backTraceDepth):
