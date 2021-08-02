@@ -121,8 +121,9 @@ def render():
     FOV = math.radians(60)
     castResolution = 20
     array = []
-    for i in range(WIDTH):
-        rayDir = FOV/WIDTH * (i - WIDTH/2) + dir
+    rayWidth = 10
+    for i in range(WIDTH//rayWidth):
+        rayDir = FOV/WIDTH/rayWidth * (i - WIDTH/2/rayWidth) + dir
         rayX = x
         rayY = y
         # Make dist not = 0. Ever
