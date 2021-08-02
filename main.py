@@ -64,8 +64,10 @@ def render():
             rayY += cosine * iteration
             iteration += 0.5
         if rayDist(rayX, rayY) < HEIGHT:
-            High = (rayX + sine * iteration, rayY + cosine * iteration)
-            Low = (rayX - sine * iteration, rayY - cosine * iteration)
+            sineIteration = sine * iteration
+            cosineIteration = cosine * iteration
+            High = (rayX + sineIteration, rayY + cosineIteration)
+            Low = (rayX - sineIteration, rayY - cosineIteration)
             if iteration < 1:
                 Low = (x, y)
             for _ in range(backTraceDepth):
@@ -78,7 +80,7 @@ def render():
             rayX = MidX
             rayY = MidY
         lineHeight = 1/max(rayDist(rayX, rayY), 1) * HEIGHT
-        pygame.draw.line(window, (min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255, min(1/rayDist(rayX, rayY), 1)*255), (i, (HEIGHT - lineHeight)/2), (i, HEIGHT + (lineHeight - HEIGHT)/2))
+        pygame.draw.line(window, [min(1/rayDist(rayX, rayY), 1)*255]*3, (i, (HEIGHT - lineHeight)/2), (i, HEIGHT + (lineHeight - HEIGHT)/2))
 
 outTermMap()
 print('Press esc to exit')
